@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using BlockChainCourse.BlockWithMultipleTransactions.Interfaces;
@@ -12,21 +12,25 @@ namespace BlockChainCourse.BlockWithMultipleTransactions
         public List<ITransaction> Transaction { get; private set; }
 
         // Set as part of the block creation process.
-        public int BlockNumber { get; private set; }
+        public int BlockNumber { get; set; }
         public DateTime CreatedDate { get; set; }
-        public string BlockHash { get; private set; }
+        public string BlockHash { get; set; }
         public string PreviousBlockHash { get; set; }
         public IBlock NextBlock { get; set; }
         private MerkleTree merkleTree = new MerkleTree();
         public void Add(int a,
                             DateTime b,
                             string c,
-                            string d)
+                            string d, IBlock parent)
         {
-            this.BlockNumber = a;
-            this.CreatedDate = b;
-            this.BlockHash = c;
-            this.PreviousBlockHash = d;
+            BlockNumber = a;
+            CreatedDate = b;
+            BlockHash = c;
+            PreviousBlockHash = d;
+            if (parent != null)
+            {
+                parent.NextBlock = this;
+            }
         }
         public Block(int blockNumber)
         {
@@ -116,6 +120,10 @@ namespace BlockChainCourse.BlockWithMultipleTransactions
                     Console.WriteLine("Block Number " + BlockNumber + " : PASS VERIFICATION");
                 }
             }
+        }
+        public MerkleTree GetMerkleTree()
+        {
+            return merkleTree;
         }
     }
 }
