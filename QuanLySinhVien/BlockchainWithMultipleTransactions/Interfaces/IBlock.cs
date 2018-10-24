@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace BlockChainCourse.BlockWithMultipleTransactions.Interfaces
@@ -16,7 +16,7 @@ namespace BlockChainCourse.BlockWithMultipleTransactions.Interfaces
         void Add(int a,
                             DateTime b,
                             string c,
-                            string d);
+                            string d, IBlock parent);
         void AddTransaction(ITransaction transaction);
         string CalculateBlockHash(string previousBlockHash);
         void SetBlockHash(IBlock parent);
