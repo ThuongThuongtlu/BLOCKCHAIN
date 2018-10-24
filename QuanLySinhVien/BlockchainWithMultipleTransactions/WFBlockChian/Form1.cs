@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -76,14 +76,14 @@ namespace WFBlockChain
         {
             int num = Convert.ToInt32(this.txtnumblock.Text.Trim());
             dataGrird.DataSource = null;
-            this.dataGrird.DataSource = chain.Blocks[num].Transaction;
+            this.dataGrird.DataSource = chain.Blocks[num].NextBlock.Transaction;
         }
 
       
         private void GhiFile()
         {
 
-            FileStream fs = new FileStream("E:\\Ledgers.txt",FileMode.Create);
+            FileStream fs = new FileStream("E:\\Ledgers.txt",FileMode.Append);
             StreamWriter sWriter = new StreamWriter(fs, Encoding.UTF8);
             for(int j=0;j<i;j++)
             {
@@ -119,40 +119,52 @@ namespace WFBlockChain
 
         private void btnimport_Click(object sender, EventArgs e)
         {
+            chain = new BlockChain();
             string filename = ("E:\\" + txtFname.Text.Trim());
             FileStream fs = new FileStream(filename, FileMode.Open);
             StreamReader rd = new StreamReader(fs, Encoding.UTF8);
-            int num = 0;
             while (!rd.EndOfStream)
             {
-                block1 = new Block(num);
+                block1 = new Block(i);
                 int line1 = Convert.ToInt32(rd.ReadLine());
                 DateTime line2 = Convert.ToDateTime(rd.ReadLine());
                 string line3 = rd.ReadLine();
                 string line4 = rd.ReadLine();
                 for (int k = 0; k < 5; k++)
                 {
-                    Transaction a = new Transaction(rd.ReadLine());
+                    ITransaction a = new Transaction(rd.ReadLine());
                     block1.AddTransaction(a);
                 }
-                block1.Add(line1, line2, line3, line4);
+                if(i==0)
+                    block1.Add(line1, line2, line3, line4,null);
+                else
+                    block1.Add(line1, line2, line3, line4, chain.Blocks[i - 1]);
                 chain.AcceptBlock(block1);
-                num++;
+                i++;
             }
-            MessageBox.Show("Inport dữ liệu thành công!!");
+            i--;
+            MessageBox.Show("Import dữ liệu thành công!!");
             rd.Close();
             Console.ReadLine();
         }
 
         private void btverify_Click(object sender, EventArgs e)
         {
-            int a = chain.VerifyChain();
-            if (a == 0)
-                MessageBox.Show("Chưa nhập blockchain");
-            if (a == 1)
-                MessageBox.Show("Blockchain còn nguyên vẹn");
-            if (a == 2)
-                MessageBox.Show("Blockchain KHÔNG còn nguyên vẹn");
+            if (chain.HeadBlock == null)
+                throw new InvalidOperationException("Chưa nhập blockchain!!");
+            else
+            {
+                bool isValid = chain.HeadBlock.IsValidChain(null, true);
+                if (isValid)
+                    MessageBox.Show("Blockchain còn nguyên vẹn ");
+                else
+                    MessageBox.Show("Blockchain KHÔNG còn nguyên vẹn");
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
